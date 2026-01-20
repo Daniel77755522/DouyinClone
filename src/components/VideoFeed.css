@@ -316,6 +316,38 @@
     font-size: 24px;
 }
 
+.floating-heart {
+    position: fixed;
+    font-size: 80px;
+    pointer-events: none;
+    z-index: 50;
+    animation: heartPop 0.8s ease-out forwards;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, -50%);
+}
+
+@keyframes heartPop {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 0;
+    }
+
+    15% {
+        transform: translate(-50%, -50%) scale(1.2) rotate(-15deg);
+        opacity: 1;
+    }
+
+    30% {
+        transform: translate(-50%, -50%) scale(1) rotate(15deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -150%) scale(1.5) rotate(0deg);
+        opacity: 0;
+    }
+}
+
 .nav-add-btn {
     width: 45px;
     height: 30px;

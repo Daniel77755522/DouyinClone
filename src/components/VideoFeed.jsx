@@ -7,6 +7,24 @@ const VideoCard = observer(({ video }) => {
     const videoRef = useRef(null);
     const [showComments, setShowComments] = useState(false);
     const [showShare, setShowShare] = useState(false);
+    const [hearts, setHearts] = useState([]);
+
+    const handleDoubleClick = (e) => {
+        const newHeart = {
+            id: Date.now(),
+            x: e.clientX,
+            y: e.clientY
+        };
+        setHearts(prev => [...prev, newHeart]);
+        if (!video.isLiked) {
+            videoStore.toggleLike(video.id);
+        }
+
+        // Remove heart after animation
+        setTimeout(() => {
+            setHearts(prev => prev.filter(h => h.id !== newHeart.id));
+        }, 1000);
+    };
 
     useEffect(() => {
         const options = { threshold: 0.6 };
@@ -26,7 +44,7 @@ const VideoCard = observer(({ video }) => {
     }, []);
 
     return (
-        <div className="video-card">
+        <div className="video-card" onDoubleClick={handleDoubleClick}>
             <video
                 ref={videoRef}
                 src={video.url}
@@ -35,6 +53,17 @@ const VideoCard = observer(({ video }) => {
                 playsInline
                 className="video-element"
             />
+
+            {/* Heart Animations */}
+            {hearts.map(heart => (
+                <div
+                    key={heart.id}
+                    className="floating-heart"
+                    style={{ left: heart.x, top: heart.y }}
+                >
+                    ❤️
+                </div>
+            ))}
 
             <div className="video-sidebar">
                 <div className="sidebar-item">
@@ -153,6 +182,7 @@ const VideoFeed = observer(() => {
     return (
         <>
             <header className="feed-header">
+                <div style={{ position: 'absolute', left: '20px', color: '#ff3b5c', fontWeight: 'bold' }}>LIVE</div>
                 <div className="header-item">Following</div>
                 <div className="header-item active">For You</div>
             </header>
@@ -174,7 +204,7 @@ const VideoFeed = observer(() => {
                 <div className="nav-item active" onClick={() => navigate('/')}>Home</div>
                 <div className="nav-item" onClick={() => navigate('/search')}>Friends</div>
                 <div className="nav-add-btn" onClick={() => navigate('/upload')}>+</div>
-                <div className="nav-item">Inbox</div>
+                <div className="nav-item" onClick={() => navigate('/inbox')}>Inbox</div>
                 <div className="nav-item" onClick={() => navigate('/profile/me')}>Profile</div>
             </nav>
         </>
