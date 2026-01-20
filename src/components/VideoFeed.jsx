@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { videoStore } from '../stores/videoStore';
 import './VideoFeed.css';
@@ -20,7 +21,6 @@ const VideoCard = observer(({ video }) => {
             videoStore.toggleLike(video.id);
         }
 
-        // Remove heart after animation
         setTimeout(() => {
             setHearts(prev => prev.filter(h => h.id !== newHeart.id));
         }, 1000);
@@ -31,10 +31,10 @@ const VideoCard = observer(({ video }) => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    videoRef.current?.play();
+                    videoRef.current?.play().catch(e => console.log("Autoplay blocked:", e));
                 } else {
                     videoRef.current?.pause();
-                    videoRef.current.currentTime = 0;
+                    if (videoRef.current) videoRef.current.currentTime = 0;
                 }
             });
         }, options);
@@ -52,58 +52,61 @@ const VideoCard = observer(({ video }) => {
                 muted
                 playsInline
                 className="video-element"
+                onClick={(e) => {
+                    // Toggle play/pause on single click if needed, but TikTok usually doesn't on single tap on card (it does on mobile)
+                    if (videoRef.current?.paused) videoRef.current.play();
+                    else videoRef.current?.pause();
+                }}
             />
 
-            {/* Heart Animations */}
             {hearts.map(heart => (
-                <div
-                    key={heart.id}
-                    className="floating-heart"
-                    style={{ left: heart.x, top: heart.y }}
-                >
-                    ❤️
-                </div>
+                <div key={heart.id} className="floating-heart" style={{ left: heart.x, top: heart.y }}>❤️</div>
             ))}
 
-            <div className="video-sidebar">
-                <div className="sidebar-item">
+            <div className="video-sidebar" onClick={(e) => e.stopPropagation()}>
+                <div className="sidebar-item" onClick={(e) => e.stopPropagation()}>
                     <div className="author-disc">
                         <span style={{ fontSize: '20px' }}>👤</span>
                         <div
                             className={`follow-btn ${videoStore.following.has(video.author) ? 'following' : ''}`}
-                            onClick={() => videoStore.toggleFollow(video.author)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                videoStore.toggleFollow(video.author);
+                            }}
+                            style={{ cursor: 'pointer', pointerEvents: 'auto' }}
                         >
                             {videoStore.following.has(video.author) ? '✓' : '+'}
                         </div>
                     </div>
                 </div>
 
-                <div className="sidebar-item" onClick={() => videoStore.toggleLike(video.id)}>
+                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); videoStore.toggleLike(video.id); }} style={{ cursor: 'pointer' }}>
                     <div className={`sidebar-icon ${video.isLiked ? 'liked' : ''}`}>❤️</div>
                     <span className="sidebar-count">{video.likes}</span>
                 </div>
 
-                <div className="sidebar-item" onClick={() => setShowComments(true)}>
+                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); setShowComments(true); }} style={{ cursor: 'pointer' }}>
                     <div className="sidebar-icon">💬</div>
                     <span className="sidebar-count">{video.comments.length}</span>
                 </div>
 
-                <div className="sidebar-item">
+                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); }} style={{ cursor: 'pointer' }}>
                     <div className="sidebar-icon">✨</div>
                     <span className="sidebar-count">Save</span>
                 </div>
 
-                <div className="sidebar-item" onClick={() => setShowShare(true)}>
+                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); setShowShare(true); }} style={{ cursor: 'pointer' }}>
                     <div className="sidebar-icon">↪️</div>
                     <span className="sidebar-count">{video.shares}</span>
                 </div>
 
-                <div className="sidebar-item">
+                <div className="sidebar-item" onClick={(e) => e.stopPropagation()}>
                     <div className="music-disc"></div>
                 </div>
             </div>
 
-            <div className="video-footer">
+            <div className="video-footer" onClick={(e) => { e.stopPropagation(); navigate(`/profile/${video.author}`); }} style={{ cursor: 'pointer' }}>
                 <h4>@{video.author}</h4>
                 <p>{video.description}</p>
                 <div className="music-ticker">
@@ -111,49 +114,47 @@ const VideoCard = observer(({ video }) => {
                 </div>
             </div>
 
-            {/* Comments Drawer */}
-            <div className={`comments-modal ${showComments ? 'show' : ''}`}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+            {/* Modal overlays should stop propagation to root but be clickable themselves */}
+            <div className={`comments-modal ${showComments ? 'show' : ''}`} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', alignItems: 'center' }}>
                     <strong>{video.comments.length} comments</strong>
-                    <span onClick={() => setShowComments(false)} style={{ cursor: 'pointer', fontSize: '20px' }}>✕</span>
+                    <span
+                        onClick={(e) => { e.stopPropagation(); setShowComments(false); }}
+                        style={{ cursor: 'pointer', fontSize: '28px', padding: '10px' }}
+                    >✕</span>
                 </div>
-                <div style={{ overflowY: 'auto', height: '100%' }}>
+                <div style={{ overflowY: 'auto', height: '100%', paddingBottom: '30px' }}>
                     {video.comments.map(c => (
                         <div key={c.id} className="comment-item">
                             <div className="comment-user">@{c.user}</div>
                             <div className="comment-text">{c.text}</div>
                         </div>
                     ))}
-                    {video.comments.length === 0 && <p style={{ textAlign: 'center', opacity: 0.5 }}>No comments yet. Be the first!</p>}
+                    {video.comments.length === 0 && <p style={{ textAlign: 'center', opacity: 0.5, marginTop: '20px' }}>No comments yet.</p>}
                 </div>
             </div>
 
-            {/* Share Drawer */}
-            <div className={`share-modal ${showShare ? 'show' : ''}`}>
+            <div className={`share-modal ${showShare ? 'show' : ''}`} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', justifyContent: 'center', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
                     <strong>Share to</strong>
                 </div>
-                <div className="share-grid">
-                    <div className="share-item">
+                <div className="share-grid" style={{ padding: '25px 0' }}>
+                    <div className="share-item" onClick={(e) => { e.stopPropagation(); alert('Link Copied!'); setShowShare(false); }}>
                         <div className="share-icon">🔗</div>
                         <span>Copy Link</span>
                     </div>
-                    <div className="share-item">
+                    <div className="share-item" onClick={(e) => { e.stopPropagation(); setShowShare(false); }}>
                         <div className="share-icon" style={{ backgroundColor: '#25D366', color: 'white' }}>💬</div>
                         <span>WhatsApp</span>
                     </div>
-                    <div className="share-item">
+                    <div className="share-item" onClick={(e) => { e.stopPropagation(); setShowShare(false); }}>
                         <div className="share-icon" style={{ backgroundColor: '#1877F2', color: 'white' }}>f</div>
                         <span>Facebook</span>
                     </div>
-                    <div className="share-item">
-                        <div className="share-icon">📥</div>
-                        <span>Save Video</span>
-                    </div>
                 </div>
                 <button
-                    onClick={() => setShowShare(false)}
-                    style={{ width: '100%', padding: '15px', border: 'none', background: 'none', borderTop: '1px solid #eee', marginTop: '10px', fontWeight: 'bold' }}
+                    onClick={(e) => { e.stopPropagation(); setShowShare(false); }}
+                    style={{ width: '100%', padding: '15px', border: 'none', background: '#f5f5f5', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' }}
                 >
                     Cancel
                 </button>
@@ -161,8 +162,6 @@ const VideoCard = observer(({ video }) => {
         </div>
     );
 });
-
-import { Link, useNavigate } from 'react-router-dom';
 
 const VideoFeed = observer(() => {
     const navigate = useNavigate();
@@ -177,7 +176,7 @@ const VideoFeed = observer(() => {
         }
     };
 
-    if (videoStore.loading) return <div className="loading" style={{ color: 'white', backgroundColor: '#000', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading Douyin Feed...</div>;
+    if (videoStore.loading) return <div className="loading" style={{ color: 'white', backgroundColor: '#000', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>;
 
     return (
         <>
@@ -191,7 +190,7 @@ const VideoFeed = observer(() => {
                 {videoStore.videos.length === 0 ? (
                     <div style={{ color: 'white', textAlign: 'center', marginTop: '100px' }}>
                         <p>No videos yet.</p>
-                        <Link to="/upload" style={{ color: '#ff3b5c' }}>Upload your first video!</Link>
+                        <Link to="/upload" style={{ color: '#ff3b5c' }}>Upload one!</Link>
                     </div>
                 ) : (
                     videoStore.videos.map((video) => (
@@ -201,11 +200,11 @@ const VideoFeed = observer(() => {
             </div>
 
             <nav className="bottom-nav">
-                <div className="nav-item active" onClick={() => navigate('/')}>Home</div>
-                <div className="nav-item" onClick={() => navigate('/search')}>Friends</div>
-                <div className="nav-add-btn" onClick={() => navigate('/upload')}>+</div>
-                <div className="nav-item" onClick={() => navigate('/inbox')}>Inbox</div>
-                <div className="nav-item" onClick={() => navigate('/profile/me')}>Profile</div>
+                <div className="nav-item active" onClick={(e) => { e.stopPropagation(); navigate('/'); }}>Home</div>
+                <div className="nav-item" onClick={(e) => { e.stopPropagation(); navigate('/search'); }}>Friends</div>
+                <div className="nav-add-btn" onClick={(e) => { e.stopPropagation(); navigate('/upload'); }}>+</div>
+                <div className="nav-item" onClick={(e) => { e.stopPropagation(); navigate('/inbox'); }}>Inbox</div>
+                <div className="nav-item" onClick={(e) => { e.stopPropagation(); navigate('/profile/me'); }}>Profile</div>
             </nav>
         </>
     );

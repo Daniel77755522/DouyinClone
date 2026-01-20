@@ -129,10 +129,25 @@
     opacity: 0.6;
     font-size: 14px;
     font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.nav-item:active {
+    opacity: 0.4;
 }
 
 .nav-item.active {
     opacity: 1;
+}
+
+.nav-add-btn {
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.nav-add-btn:active {
+    transform: scale(0.9);
 }
 
 .sidebar-icon.liked {
@@ -227,12 +242,16 @@
     z-index: 100;
     color: black;
     padding: 20px;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
     transform: translateY(100%);
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .comments-modal.show {
     transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .comment-item {
@@ -260,10 +279,14 @@
     z-index: 20;
     font-weight: 600;
     font-size: 17px;
+    pointer-events: none;
+    /* Let clicks pass through to video double-tap if clicking empty space */
 }
 
 .header-item {
     opacity: 0.6;
+    pointer-events: auto;
+    /* Buttons in header should still be clickable */
 }
 
 .header-item.active {
@@ -282,12 +305,16 @@
     z-index: 100;
     color: black;
     padding: 20px;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
     transform: translateY(100%);
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .share-modal.show {
     transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .share-grid {
