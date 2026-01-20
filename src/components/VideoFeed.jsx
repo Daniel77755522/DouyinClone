@@ -199,9 +199,32 @@ const VideoFeed = observer(() => {
 
             <div className="video-container" onScroll={handleScroll}>
                 {videoStore.filteredVideos.length === 0 ? (
-                    <div style={{ color: 'white', textAlign: 'center', marginTop: '100px' }}>
-                        <p>{videoStore.feedType === 'following' ? "You aren't following anyone yet." : "No videos yet."}</p>
-                        <Link to="/upload" style={{ color: '#ff3b5c' }}>Upload one!</Link>
+                    <div style={{ color: 'white', textAlign: 'center', marginTop: '100px', padding: '20px' }}>
+                        {videoStore.feedType === 'following' ? (
+                            <>
+                                <h3>Start following creators!</h3>
+                                <p style={{ opacity: 0.6 }}>Follow someone to see their latest videos here.</p>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px', marginTop: '30px' }}>
+                                    {['cyberpunk_queen', 'nature_vibe', 'blue_dancer'].map(author => (
+                                        <div key={author} style={{ backgroundColor: '#111', padding: '15px', borderRadius: '10px', border: '1px solid #333' }}>
+                                            <div style={{ fontSize: '30px', marginBottom: '10px' }}>👤</div>
+                                            <div style={{ fontWeight: 'bold' }}>@{author}</div>
+                                            <button
+                                                onClick={() => videoStore.toggleFollow(author)}
+                                                style={{ marginTop: '10px', backgroundColor: '#ff3b5c', border: 'none', color: 'white', padding: '5px 15px', borderRadius: '4px' }}
+                                            >
+                                                {videoStore.following.has(author) ? 'Following' : 'Follow'}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <p>No videos yet.</p>
+                                <Link to="/upload" style={{ color: '#ff3b5c' }}>Upload one!</Link>
+                            </>
+                        )}
                     </div>
                 ) : (
                     videoStore.filteredVideos.map((video) => (
