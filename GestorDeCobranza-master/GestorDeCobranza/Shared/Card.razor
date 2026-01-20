@@ -1,0 +1,19 @@
+﻿<div class="content-card">
+    <div class="card-header">
+        <div style="display:flex; align-items:center; gap:12px">
+            <h2 class="card-title">@Title</h2>
+        </div>
+        @HeaderAction
+    </div>
+
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Default card title";
+    [Parameter]
+    public RenderFragment? HeaderAction { get; set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

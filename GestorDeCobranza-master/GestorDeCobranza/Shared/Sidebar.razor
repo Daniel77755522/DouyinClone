@@ -1,0 +1,24 @@
+﻿<aside class="sidebar @(Collapsed ? "collapsed":"")" id="sidebar">
+    <ul class="sidebar-menu">
+        <li>
+            <NavLink href="gestioncampanas" Match="NavLinkMatch.Prefix">
+                <i class="fas fa-bullhorn"></i><span>Gestión de Campañas</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink href="gestiondeudores" Match="NavLinkMatch.Prefix">
+                <i class="fas fa-users"></i><span>Gestión de Deudores</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink href="operadores" Match="NavLinkMatch.Prefix">
+                <i class="fas fa-user-friends"></i><span>Operadores</span>
+            </NavLink>
+        </li>
+    </ul>
+</aside>
+
+@code {
+    [Parameter]
+    public bool Collapsed { get; set; }
+}

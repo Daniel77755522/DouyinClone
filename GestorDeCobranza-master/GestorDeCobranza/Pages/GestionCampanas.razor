@@ -1,0 +1,163 @@
+﻿@page "/gestioncampanas"
+@using GestorDeCobranza.Model
+
+<div id="campaignsSection">
+    @* --- Cabecera --- *@
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <h1 class="page-title">Gestión de Campañas</h1>
+            <p class="page-subtitle">Administra y monitorea tus campañas de cobranza</p>
+        </div>
+        @* --- FILTRO POR AÑO --- *@
+        <div style="background: white; padding: 8px 16px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px;">
+            <label style="font-weight: 600; color: #163370; font-size: 14px;">Gestión:</label>
+            <select class="form-select" @bind="filtroAnio" style="width: auto; border: none; font-weight: 700; color: #163370; cursor: pointer;">
+                @foreach (var anio in aniosDisponibles)
+                {
+                    <option value="@anio">@anio</option>
+                }
+            </select>
+        </div>
+    </div>
+
+
+    @* --- Métricas (Usando el componente Metric.razor) --- *@
+    <div class="metrics-grid">
+        <Metric Label="Total Campañas" Value="@campanas.Count.ToString()" Change="+1 esta semana" />
+        <Metric Label="Campañas Activas" Value="@campanas.Count(c => c.Estado == "activa").ToString()" Change="En curso" />
+        <Metric Label="Meta Promedio" Value="75%" Change="+5% vs mes anterior" />
+        <Metric Label="Recaudación Total" Value="$12.5k" Change="+12%" />
+    </div>
+
+    @* --- Tabla de Campañas --- *@
+    <Card Title="Lista de Campañas">
+        <HeaderAction>
+            <button class="btn btn-primary" @onclick="OpenModal">
+                <i class="fas fa-plus"></i> Nueva Campaña
+            </button>
+        </HeaderAction>
+        <ChildContent>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Campaña</th>
+                            <th>Periodo</th>
+                            <th>Meta</th>
+                            <th>Progreso</th>
+                            <th>Estado</th>
+                            <th style="width:150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var camp in campanasFiltradas)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="debtor-details">
+                                        <h4 style="margin:0; color:#1e293b;">@camp.Nombre</h4>
+                                        <p style="margin:0; font-size:12px; color:#64748b;">@camp.Descripcion</p>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:13px;">
+                                        <div><i class="fas fa-calendar-alt"></i> @camp.FechaInicio.ToShortDateString()</div>
+                                        <div style="color:#64748b;">al @camp.FechaFin.ToShortDateString()</div>
+                                    </div>
+                                </td>
+                                <td>$@camp.Meta.ToString("N0")</td>
+                                <td>
+                                    <div style="display:flex; align-items:center; gap: 8px;">
+                                        <div style="flex:1; background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden">
+                                            <div style="width:@camp.Progreso%; height: 100%; background: #3b82f6;"></div>
+                                        </div>
+                                        <span style="font-weight:600;">@camp.Progreso%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="history-badge @(camp.Estado == "activa" ? "success" : "")">@camp.EstadoText</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn" style="background:#dbeafe; color:#1e40af" title="Editar"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn" style="background:#fee2e2; color:#991b1b" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </ChildContent>
+    </Card>
+
+    @* --- Modal para Nueva Campaña --- *@
+    <Modal Title="Nueva Campaña" IsVisible="@showModal" OnClose="CloseModal">
+        <FormContent>
+            <EditForm Model="nuevaCampana" OnValidSubmit="SaveCampana">
+                <div class="modal-section">
+                    <div class="form-group">
+                        <label class="form-label">Nombre de la Campaña</label>
+                        <InputText class="form-input" @bind-Value="nuevaCampana.Nombre" placeholder="Ej: Cobranza Enero 2024" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <InputTextArea class="form-input" @bind-Value="nuevaCampana.Descripcion" placeholder="Detalles de la campaña..." />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Meta ($)</label>
+                            <InputNumber class="form-input" @bind-Value="nuevaCampana.Meta" />
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:32px;">
+                    <button class="btn btn-secondary" @onclick="CloseModal" type="button">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Guardar Campaña</button>
+                </div>
+            </EditForm>
+        </FormContent>
+    </Modal>
+</div>
+
+@code {
+    private int filtroAnio { get; set; } = DateTime.Now.Year;
+    private List<int> aniosDisponibles = new() { 2023, 2024, 2025, 2026 };
+    private List<Campana> campanasFiltradas => campanas
+        .Where(c => c.FechaInicio.Year == filtroAnio)
+        .ToList();
+    private bool showModal = false;
+    private List<Campana> campanas = new();
+    private Campana nuevaCampana = new();
+
+    protected override void OnInitialized()
+    {
+        // Datos de ejemplo iniciales (como hiciste en Operadores)
+        campanas.Add(new Campana
+        {
+            Id = 1,
+            Nombre = "Campaña Recuperación VIP",
+            Descripcion = "Clientes con mora > 90 días",
+            Meta = 50000,
+            Progreso = 45,
+            Estado = "activa",
+            EstadoText = "Activa"
+        });
+    }
+
+    private void OpenModal() => showModal = true;
+    private void CloseModal() => showModal = false;
+
+    private void SaveCampana()
+    {
+        if (string.IsNullOrWhiteSpace(nuevaCampana.Nombre)) return;
+
+        nuevaCampana.Id = campanas.Count + 1;
+        nuevaCampana.Estado = "activa";
+        nuevaCampana.EstadoText = "Activa";
+        campanas.Add(nuevaCampana);
+
+        nuevaCampana = new Campana(); // Reset
+        showModal = false;
+    }
+}

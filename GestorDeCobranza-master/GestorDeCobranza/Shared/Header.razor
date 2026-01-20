@@ -1,0 +1,38 @@
+﻿<header class="header">
+    <div class="header-left">
+        <button class="hamburger icon-blue" @onclick="OnToggleSidebar" aria-label="Alternar barra lateral">
+            <i  class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-phone-alt icon-white"></i>
+            </div>
+            <span>Cobranzas</span>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="action-btn">
+            <i class="fas fa-bell icon-blue"></i>
+        </button>
+        <button class="action-btn">
+            <i class="fas fa-cog icon-blue"></i>
+        </button>
+        <div class="user-menu">
+            <div class="user-avatar">CB</div>
+            <span style="font-weight:600; color:#163370;">Cristhian Barrancos</span>
+        </div>
+    </div>
+</header>
+
+@code {
+    [Parameter]
+    public EventCallback OnToggleSidebar { get; set; }
+    
+    private async Task ToggleSidebar()
+    {
+        if (OnToggleSidebar.HasDelegate)
+        {
+            await OnToggleSidebar.InvokeAsync(null);
+        }
+    }
+}

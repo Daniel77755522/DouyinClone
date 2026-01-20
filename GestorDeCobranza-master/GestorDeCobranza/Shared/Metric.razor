@@ -1,0 +1,14 @@
+﻿<div class="metric-card">
+    <div class="metric-label">@Label</div>
+    <div class="metric-value">@Value</div>
+    <div class="metric-change">@Change</div>
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "Default label";
+    [Parameter]
+    public string Value { get; set; } = "0";
+    [Parameter]
+    public string Change { get; set; } = "Default change";
+}

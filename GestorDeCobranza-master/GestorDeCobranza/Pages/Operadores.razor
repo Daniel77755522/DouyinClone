@@ -1,0 +1,234 @@
+﻿@page "/operadores"
+
+<div id="operatorsSection">
+    <div class="page-header">
+        <h1 class="page-title">Gestión de Operadores</h1>
+        <p class="page-subtitle">Administra el equipo de cobranza</p>
+    </div>
+
+    <div class="metrics-grid">
+        <Metric Label="Total Operadores" Value="8" Change="+2 este mes"/>
+        <Metric Label="Operadores Activos" Value="6" Change="En campañas activas"/>
+        <Metric Label="Promedio Contactos/Día" Value="38" Change="+8% esta semana"/>
+        <Metric Label="Tasa Éxito Promedio" Value="72%" Change="+4% este mes"/>
+    </div>
+
+    <Card Title="Lista Operadores">
+        <HeaderAction>
+            <button class="btn btn-primary" @onclick="OpenModal">
+                <i class="fas fa-plus"></i> Nuevo Operador
+            </button>
+        </HeaderAction>
+        <ChildContent>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40px;"><input type="checkbox"/></th>
+                            <th>Operador</th>
+                            <th>Contacto</th>
+                            <th>Campañas activas</th>
+                            <th>Contactos hoy</th>
+                            <th>Tasa de éxito</th>
+                            <th>Estado</th>
+                            <th style="width:150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    @foreach(var op in operadores)
+                    {
+                        <tbody>
+                            <td><input type="checkbox"/></td>
+                            <td>
+                                <div class="debtor-info">
+                                    <div class="debtor-avatar" style="background:@op.AvatarColor">
+                                    @(string.IsNullOrEmpty(op.FirstName) ? "" : op.FirstName[0].ToString())@(string.IsNullOrEmpty(op.LastName) ? "" : op.LastName[0].ToString())
+                                    </div>
+                                    <div class="debtor-details">
+                                        <h4>@op.FirstName @op.LastName</h4>
+                                        <p>Código: @op.Code</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <div class="contact-item">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>@op.Email</span>
+                                    </div>
+                                    <div class="contact-item">
+                                        <i class="fas fa-phone"></i>
+                                        <span>@op.Phone</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size:20px; font-weight:700; color:#163370;">@op.Campaigns</div>
+                                <div style="font-size:13px; color:#64748b;">campañas asignadas</div>
+                            </td>
+                            <td>
+                                <div style="font-size:18px; font-weight:600; color:#163370;">@op.ContactsToday</div>
+                                <div style="font-size:12px; color:#64748b;">contactos</div>
+                            </td>
+                            <td>
+                                <div style="display:flex; align-items:center; gap: 8px;">
+                                    <div style="flex:1; background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden">
+                                        <div style="width:@op.SuccessRate%; height: 100%; background: @(op.SuccessRate > 75 ? "#10b981":"#f59e0b"); transition:width 0.3s"></div>
+                                    </div>
+                                    <span style="font-weight:600; color:#163370; min-width:40px;">@op.SuccessRate%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="history-badge @(op.Status == "active" ? "success":"")">@op.StatusText</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" style="background:#dbeafe; color:#1e40af"; title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn" style="background:#fee2e2; color:#991b1b"; title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tbody>    
+                    }
+                </table>
+            </div>
+        </ChildContent>
+    </Card>
+    
+    <Modal Title="Nuevo Operador" IsVisible="@showModal" OnClose="CloseModal">
+        <FormContent>
+            <EditForm Model="newOperador" OnValidSubmit="SaveOperador">
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <i class="fas fa-user"></i>
+                        Información Personal
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nombre</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <InputText class="form-input" @bind-Value="newOperador.FirstName" id="operatorFirstName" placeholder="Ej: María" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Apellido</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <InputText class="form-input" @bind-Value="newOperador.LastName" id="operatorLastName" placeholder="Ej: Rodríguez" />
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <i class="fas fa-address-card"></i>Información de Contacto
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <InputText class="form-input" @bind-Value="newOperador.Email" id="operatorEmail" placeholder="operador@empresa.com" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone"></i>
+                            <InputText class="form-input" @bind-Value="newOperador.Phone" id="operatorPhone" placeholder="+1 (555) 123-4567" />
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:32px;">
+                    <button class="btn btn-secondary" @onclick="CloseModal" type="button">
+                        <i class="fas fa-times"></i>Cancelar
+                    </button>
+                    <button class="btn btn-primary" @onclick="SaveOperador" type="submit">
+                        <i class="fas fa-check"></i>Guardar
+                    </button>
+                </div>
+            </EditForm>
+        </FormContent>
+    </Modal>
+</div>
+
+@code {
+    private bool showModal = false;
+    public List<Operador> operadores { get; set; } = new();
+    private Operador newOperador = new();
+
+    protected override void OnInitialized()
+    {
+        var operador1 = new Operador
+            {
+                Id = 1,
+                FirstName = "María",
+                LastName = "Rodríguez",
+                Email = "maria.rodriguez@empresa.com",
+                Phone = "+1 (555) 234-5678",
+                Code = "OP-001",
+                Status = "active",
+                StatusText = "Activo",
+                Campaigns = 2,
+                ContactsToday = 42,
+                SuccessRate = 78,
+                AvatarColor = "#ef4444"
+            };
+
+        operadores.Add(operador1);
+
+        var operador2 = new Operador
+            {
+                Id = 5,
+                FirstName = "Ana",
+                LastName = "Martínez",
+                Email = "ana.martinez@empresa.com",
+                Phone = "+1 (555) 432-8765",
+                Code = "OP-005",
+                Status = "inactive",
+                StatusText = "Inactivo",
+                Campaigns = 0,
+                ContactsToday = 0,
+                SuccessRate = 71,
+                AvatarColor = "#06b6d4"
+            };
+
+        operadores.Add(operador2);
+    }
+
+    private void OpenModal() => showModal = true;
+
+    private void CloseModal() => showModal = false;
+
+    private async Task SaveOperador()
+    {
+        if(string.IsNullOrWhiteSpace(newOperador.FirstName) || string.IsNullOrWhiteSpace(newOperador.LastName))
+        {
+            return;
+        }
+
+        var operadorToAdd = new Operador
+            {
+                Id = operadores.Count + 1,
+                FirstName = newOperador.FirstName,
+                LastName = newOperador.LastName,
+                Email = newOperador.Email,
+                Phone = newOperador.Phone,
+                Code = $"OP-{operadores.Count + 1:000}",
+                Status = "active",
+                StatusText = "Activo",
+                Campaigns = 0,
+                ContactsToday = 0,
+                SuccessRate = 0,
+                AvatarColor = AvatarColorGenerator.GetColor(newOperador.FirstName, newOperador.LastName)
+        
+        };
+
+        operadores.Add(operadorToAdd);
+
+        newOperador = new Operador();
+        showModal = false;
+    }
+ }

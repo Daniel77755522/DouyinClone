@@ -1,0 +1,19 @@
+﻿@inherits LayoutComponentBase
+<Header OnToggleSidebar="ToogleSidebard"/>
+
+<Sidebar Collapsed="@_sidebarCollapsed"/>
+
+<main class="main-content @(_sidebarCollapsed ? "expanded":"")" id="mainContent">
+    @Body 
+</main>
+
+@code {
+    private bool _sidebarCollapsed = false;
+
+    private Task ToogleSidebard()
+    {
+        _sidebarCollapsed = !_sidebarCollapsed;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}
