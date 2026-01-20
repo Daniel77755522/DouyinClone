@@ -27,21 +27,23 @@ const VideoCard = observer(({ video }) => {
     };
 
     useEffect(() => {
-        const options = { threshold: 0.6 };
+        const options = { threshold: 0.7 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    videoRef.current?.play().catch(e => console.log("Autoplay blocked:", e));
+                    videoRef.current?.play().catch(() => {
+                        // If autoplay fails, it might need user interaction
+                        console.log("Interaction needed to play");
+                    });
                 } else {
                     videoRef.current?.pause();
-                    if (videoRef.current) videoRef.current.currentTime = 0;
                 }
             });
         }, options);
 
         if (videoRef.current) observer.observe(videoRef.current);
         return () => observer.disconnect();
-    }, []);
+    }, [video.url]);
 
     return (
         <div className="video-card" onDoubleClick={handleDoubleClick}>
@@ -51,9 +53,10 @@ const VideoCard = observer(({ video }) => {
                 loop
                 muted
                 playsInline
+                autoPlay
                 className="video-element"
                 onClick={(e) => {
-                    // Toggle play/pause on single click if needed, but TikTok usually doesn't on single tap on card (it does on mobile)
+                    e.stopPropagation();
                     if (videoRef.current?.paused) videoRef.current.play();
                     else videoRef.current?.pause();
                 }}
@@ -176,10 +179,14 @@ const VideoFeed = observer(() => {
         }
     };
 
-    if (videoStore.loading) return <div className="loading" style={{ color: 'white', backgroundColor: '#000', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>;
-
     return (
-        <>
+        <div style={{ backgroundColor: '#000', height: '100vh', overflow: 'hidden', position: 'relative' }}>
+            {videoStore.loading && videoStore.videos.length === 0 && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#000', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100 }}>
+                    <div className="loading-spinner">Loading Douyin...</div>
+                </div>
+            )}
+
             <header className="feed-header">
                 <div
                     style={{ position: 'absolute', left: '20px', color: '#ff3b5c', fontWeight: 'bold', cursor: 'pointer' }}
@@ -240,7 +247,7 @@ const VideoFeed = observer(() => {
                 <div className="nav-item" onClick={(e) => { e.stopPropagation(); navigate('/inbox'); }}>Inbox</div>
                 <div className="nav-item" onClick={(e) => { e.stopPropagation(); navigate('/profile/me'); }}>Profile</div>
             </nav>
-        </>
+        </div>
     );
 });
 

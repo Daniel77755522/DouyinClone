@@ -39,30 +39,29 @@ class VideoStore {
         const newBatch = [
             {
                 id: `v${Date.now()}-1`,
-                url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4',
-                author: 'cyberpunk_queen',
-                description: 'More neon vibes! #future',
-                likes: Math.floor(Math.random() * 5000),
+                url: 'https://res.cloudinary.com/dpgu9i9id/video/upload/v1705663674/samples/sea-turtle.mp4',
+                author: 'nature_vibe',
+                description: 'Beautiful sea turtle! 🐢 #nature',
+                likes: 12500,
                 isLiked: false,
                 isSaved: false,
                 comments: [
-                    { id: 1, user: 'cool_user', text: 'Love the neon!' },
-                    { id: 2, user: 'tech_fan', text: 'Where is this?' }
+                    { id: 1, user: 'diver_pro', text: 'Amazing clarity!' }
                 ],
-                shares: 100,
-                music: 'Cyber Synth v2'
+                shares: 450,
+                music: 'Salty Air - Nature'
             },
             {
                 id: `v${Date.now()}-2`,
-                url: 'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4',
-                author: 'nature_vibe',
-                description: 'Seasonal changes. 🍃',
-                likes: Math.floor(Math.random() * 2000),
+                url: 'https://res.cloudinary.com/dpgu9i9id/video/upload/v1705663674/samples/elephants.mp4',
+                author: 'safari_explorer',
+                description: 'Incredible giants. 🐘',
+                likes: 8900,
                 isLiked: false,
                 isSaved: false,
                 comments: [],
-                shares: 50,
-                music: 'Calm Piano'
+                shares: 120,
+                music: 'African Sunset'
             }
         ];
 
