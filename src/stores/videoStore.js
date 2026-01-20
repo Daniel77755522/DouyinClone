@@ -5,14 +5,26 @@ class VideoStore {
     videos = [];
     currentVideoIndex = 0;
     loading = false;
-    following = new Set(); // Set of author names user follows
+    following = new Set();
+    feedType = 'forYou';
 
     constructor() {
         makeAutoObservable(this);
     }
 
+    setFeedType(type) {
+        this.feedType = type;
+    }
+
+    get filteredVideos() {
+        if (this.feedType === 'following') {
+            return this.videos.filter(v => this.following.has(v.author));
+        }
+        return this.videos;
+    }
+
     async fetchVideos() {
-        if (this.videos.length > 0) return; // Don't fetch if already have videos
+        if (this.videos.length > 0) return;
         this.loading = true;
         try {
             await this.loadMoreVideos();
@@ -24,7 +36,6 @@ class VideoStore {
     }
 
     async loadMoreVideos() {
-        // Simulating loading a new "page" of videos
         const newBatch = [
             {
                 id: `v${Date.now()}-1`,
@@ -33,7 +44,11 @@ class VideoStore {
                 description: 'More neon vibes! #future',
                 likes: Math.floor(Math.random() * 5000),
                 isLiked: false,
-                comments: [],
+                isSaved: false,
+                comments: [
+                    { id: 1, user: 'cool_user', text: 'Love the neon!' },
+                    { id: 2, user: 'tech_fan', text: 'Where is this?' }
+                ],
                 shares: 100,
                 music: 'Cyber Synth v2'
             },
@@ -44,6 +59,7 @@ class VideoStore {
                 description: 'Seasonal changes. 🍃',
                 likes: Math.floor(Math.random() * 2000),
                 isLiked: false,
+                isSaved: false,
                 comments: [],
                 shares: 50,
                 music: 'Calm Piano'
@@ -63,6 +79,7 @@ class VideoStore {
             description: description,
             likes: 0,
             isLiked: false,
+            isSaved: false,
             comments: [],
             shares: 0,
             music: 'Original Sound - Daniel77755522'
@@ -77,6 +94,13 @@ class VideoStore {
         if (video) {
             video.isLiked = !video.isLiked;
             video.likes += video.isLiked ? 1 : -1;
+        }
+    }
+
+    toggleSaved(videoId) {
+        const video = this.videos.find(v => v.id === videoId);
+        if (video) {
+            video.isSaved = !video.isSaved;
         }
     }
 

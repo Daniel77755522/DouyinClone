@@ -4,6 +4,7 @@ import './VideoFeed.css'; // Reuse some basic styles or add specific ones
 
 const Search = () => {
     const navigate = useNavigate();
+    const [query, setQuery] = React.useState('');
     const trending = ['#Cyberpunk', '#DanceChallenge', '#TechReels', '#NatureVibe'];
 
     return (
@@ -14,6 +15,8 @@ const Search = () => {
                     <input
                         type="text"
                         placeholder="Search videos, users, sounds..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
                         style={{
                             width: '100%',
                             padding: '10px 15px',
@@ -30,7 +33,11 @@ const Search = () => {
             <h3 style={{ marginTop: '20px' }}>Trending</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {trending.map(tag => (
-                    <div key={tag} style={{ backgroundColor: '#222', padding: '15px', borderRadius: '10px', fontSize: '14px' }}>
+                    <div
+                        key={tag}
+                        onClick={() => setQuery(tag)}
+                        style={{ backgroundColor: '#222', padding: '15px', borderRadius: '10px', fontSize: '14px', cursor: 'pointer' }}
+                    >
                         {tag}
                     </div>
                 ))}

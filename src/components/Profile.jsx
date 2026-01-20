@@ -18,7 +18,10 @@ const Profile = () => {
                     <span><strong>45K</strong> Followers</span>
                     <span><strong>1.2M</strong> Likes</span>
                 </div>
-                <button style={{ marginTop: '20px', padding: '10px 40px', backgroundColor: '#333', border: 'none', color: 'white', borderRadius: '5px', fontWeight: 'bold' }}>Edit Profile</button>
+                <button
+                    onClick={() => alert('Edit Profile clicked! You can customize this to open a form.')}
+                    style={{ marginTop: '20px', padding: '10px 40px', backgroundColor: '#333', border: 'none', color: 'white', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}
+                >Edit Profile</button>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '30px', borderBottom: '1px solid #222', paddingBottom: '10px' }}>

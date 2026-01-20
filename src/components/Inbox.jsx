@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
+import { videoStore } from '../stores/videoStore';
 
-const Inbox = () => {
+const Inbox = observer(() => {
     const navigate = useNavigate();
     const activities = [
         { id: 1, user: 'cyberpunk_queen', action: 'liked your video', time: '2h', avatar: '👑' },
@@ -25,7 +27,12 @@ const Inbox = () => {
                             <span style={{ fontWeight: 'bold' }}>{act.user}</span> {act.action}
                             <div style={{ color: '#555', fontSize: '12px' }}>{act.time}</div>
                         </div>
-                        <button style={{ backgroundColor: '#ff3b5c', border: 'none', color: 'white', padding: '5px 15px', borderRadius: '4px', fontSize: '12px' }}>Follow</button>
+                        <button
+                            onClick={() => videoStore.toggleFollow(act.user)}
+                            style={{ backgroundColor: videoStore.following.has(act.user) ? '#333' : '#ff3b5c', border: 'none', color: 'white', padding: '5px 15px', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}
+                        >
+                            {videoStore.following.has(act.user) ? 'Following' : 'Follow'}
+                        </button>
                     </div>
                 ))}
             </div>
@@ -39,6 +46,6 @@ const Inbox = () => {
             </nav>
         </div>
     );
-};
+});
 
 export default Inbox;

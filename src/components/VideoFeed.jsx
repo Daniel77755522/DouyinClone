@@ -91,9 +91,9 @@ const VideoCard = observer(({ video }) => {
                     <span className="sidebar-count">{video.comments.length}</span>
                 </div>
 
-                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); }} style={{ cursor: 'pointer' }}>
-                    <div className="sidebar-icon">✨</div>
-                    <span className="sidebar-count">Save</span>
+                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); videoStore.toggleSaved(video.id); }} style={{ cursor: 'pointer' }}>
+                    <div className={`sidebar-icon ${video.isSaved ? 'liked' : ''}`}>✨</div>
+                    <span className="sidebar-count">{video.isSaved ? 'Saved' : 'Save'}</span>
                 </div>
 
                 <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); setShowShare(true); }} style={{ cursor: 'pointer' }}>
@@ -101,7 +101,7 @@ const VideoCard = observer(({ video }) => {
                     <span className="sidebar-count">{video.shares}</span>
                 </div>
 
-                <div className="sidebar-item" onClick={(e) => e.stopPropagation()}>
+                <div className="sidebar-item" onClick={(e) => { e.stopPropagation(); alert(`Now playing: ${video.music}`); }} style={{ cursor: 'pointer' }}>
                     <div className="music-disc"></div>
                 </div>
             </div>
@@ -181,19 +181,30 @@ const VideoFeed = observer(() => {
     return (
         <>
             <header className="feed-header">
-                <div style={{ position: 'absolute', left: '20px', color: '#ff3b5c', fontWeight: 'bold' }}>LIVE</div>
-                <div className="header-item">Following</div>
-                <div className="header-item active">For You</div>
+                <div
+                    style={{ position: 'absolute', left: '20px', color: '#ff3b5c', fontWeight: 'bold', cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); alert('LIVE mode is currently a placeholder!'); }}
+                >LIVE</div>
+                <div
+                    className={`header-item ${videoStore.feedType === 'following' ? 'active' : ''}`}
+                    onClick={(e) => { e.stopPropagation(); videoStore.setFeedType('following'); }}
+                    style={{ cursor: 'pointer' }}
+                >Following</div>
+                <div
+                    className={`header-item ${videoStore.feedType === 'forYou' ? 'active' : ''}`}
+                    onClick={(e) => { e.stopPropagation(); videoStore.setFeedType('forYou'); }}
+                    style={{ cursor: 'pointer' }}
+                >For You</div>
             </header>
 
             <div className="video-container" onScroll={handleScroll}>
-                {videoStore.videos.length === 0 ? (
+                {videoStore.filteredVideos.length === 0 ? (
                     <div style={{ color: 'white', textAlign: 'center', marginTop: '100px' }}>
-                        <p>No videos yet.</p>
+                        <p>{videoStore.feedType === 'following' ? "You aren't following anyone yet." : "No videos yet."}</p>
                         <Link to="/upload" style={{ color: '#ff3b5c' }}>Upload one!</Link>
                     </div>
                 ) : (
-                    videoStore.videos.map((video) => (
+                    videoStore.filteredVideos.map((video) => (
                         <VideoCard key={video.id} video={video} />
                     ))
                 )}
