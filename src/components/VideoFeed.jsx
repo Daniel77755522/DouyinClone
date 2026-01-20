@@ -1,78 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import { videoStore } from '../stores/vide9:44:00 AM: Netlify Build                                                 
-9: 44:00 AM: ────────────────────────────────────────────────────────────────
-9: 44:00 AM:
-9: 44:00 AM: ❯ Version
-9: 44:00 AM: @netlify/build 35.5.10
-9: 44:00 AM:
-9: 44:00 AM: ❯ Flags
-9: 44:00 AM: accountId: 696f7c2b0f18e4ea40af5d26
-9: 44:00 AM: baseRelDir: true
-9: 44:00 AM: buildId: 696f8672516ce945e23b701e
-9: 44:00 AM: deployId: 696f8672516ce945e23b7020
-9: 44:00 AM:
-9: 44:00 AM: ❯ Current directory
-9: 44:00 AM: /opt/build / repo
-9: 44:00 AM:
-9: 44:00 AM: ❯ Config file
-9: 44:00 AM: /opt/build / repo / netlify.toml
-9: 44:00 AM:
-9: 44:00 AM: ❯ Context
-9: 44:00 AM: production
-9: 44:00 AM:
-9: 44:00 AM: Build command from Netlify app
-9: 44:00 AM: ────────────────────────────────────────────────────────────────
-9: 44:00 AM:
-9: 44:00 AM: $ npm run build
-9: 44:00 AM: > douyin - clone@1.0.0 build
-9: 44:00 AM: > react - scripts build
-9: 44:01 AM: Creating an optimized production build...
-9: 44:09 AM: Failed during stage 'building site': Build script returned non - zero exit code: 2(https://ntl.fyi/exit-code-2)
-    9: 44:09 AM: Failed to compile.
-9: 44:09 AM:
-    9: 44:09 AM: [eslint]
-9: 44:09 AM: src / components / VideoFeed.jsx
-9: 44:09 AM: Line 112: 82: 'navigate' is not defined  no - undef
-9: 44:09 AM: Search for the keywords to learn more about each error.
-9: 44:09 AM:
-9: 44:09 AM: "build.command" failed
-9: 44:09 AM: ────────────────────────────────────────────────────────────────
-9: 44:09 AM:
-9: 44:09 AM:   Error message
-9: 44:09 AM:   Command failed with exit code 1: npm run build(https://ntl.fyi/exit-code-1)
-    9: 44:09 AM:
-    9: 44:09 AM: Error location
-9: 44:09 AM: In Build command from Netlify app:
-    9: 44:09 AM: npm run build
-9: 44:09 AM:
-    9: 44:09 AM: Resolved config
-9: 44:09 AM: build:
-    9: 44:09 AM: command: npm run build
-9: 44:09 AM: commandOrigin: ui
-9: 44:09 AM: publish: /opt/build / repo / build
-9: 44:09 AM: publishOrigin: ui
-9: 44:09 AM: headers:
-    9: 44:09 AM: - for: /*
-      values:
-        Content-Security-Policy: upgrade-insecure-requests
-        Permissions-Policy: camera=(), microphone=(), geolocation=()
-        Referrer-Policy: strict-origin-when-cross-origin
-        Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-        X-Content-Type-Options: nosniff
-        X-Frame-Options: SAMEORIGIN
-        X-XSS-Protection: 1; mode=block
-  headersOrigin: config
-  redirects:
-    - from: /*
-      status: 200
-      to: /index.html
-  redirectsOrigin: config
-9:44:09 AM: Build failed due to a user error: Build script returned non-zero exit code: 2
-9:44:09 AM: Failing build: Failed to build site
-9:44:10 AM: Finished processing build request in 41.882s
-oStore';
+import { videoStore } from '../stores/videoStore';
 import './VideoFeed.css';
 
 const VideoCard = observer(({ video }) => {
@@ -104,7 +33,6 @@ const VideoCard = observer(({ video }) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     videoRef.current?.play().catch(() => {
-                        // If autoplay fails, it might need user interaction
                         console.log("Interaction needed to play");
                     });
                 } else {
@@ -189,7 +117,6 @@ const VideoCard = observer(({ video }) => {
                 </div>
             </div>
 
-            {/* Modal overlays should stop propagation to root but be clickable themselves */}
             <div className={`comments-modal ${showComments ? 'show' : ''}`} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', alignItems: 'center' }}>
                     <strong>{video.comments.length} comments</strong>
@@ -234,7 +161,7 @@ const VideoCard = observer(({ video }) => {
                     Cancel
                 </button>
             </div>
-        </div >
+        </div>
     );
 });
 
