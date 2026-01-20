@@ -12,65 +12,64 @@ class VideoStore {
     }
 
     async fetchVideos() {
+        if (this.videos.length > 0) return; // Don't fetch if already have videos
         this.loading = true;
         try {
-            // Simulated data from Tanx DAM / API
-            const mockData = {
-                items: [
-                    {
-                        id: 'v1',
-                        url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4',
-                        author: 'cyberpunk_queen',
-                        description: 'Dancing in the neon lights #cyberpunk #future',
-                        likes: 1200,
-                        isLiked: false,
-                        comments: [
-                            { id: 1, user: 'techo_fan', text: 'This looks amazing!' },
-                            { id: 2, user: 'neon_rider', text: 'Love the aesthetic.' }
-                        ],
-                        shares: 450,
-                        music: 'Cyber Synth - Original Audio'
-                    },
-                    {
-                        id: 'v2',
-                        url: 'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4',
-                        author: 'nature_vibe',
-                        description: 'Peaceful morning in the woods. 🍂 #autumn #chill',
-                        likes: 890,
-                        isLiked: false,
-                        comments: [
-                            { id: 3, user: 'leaf_lover', text: 'So relaxing.' }
-                        ],
-                        shares: 120,
-                        music: 'Nature Sounds - Relaxing Mix'
-                    },
-                    {
-                        id: 'v3',
-                        url: 'https://assets.mixkit.co/videos/preview/mixkit-young-woman-with-blue-hair-dancing-42289-large.mp4',
-                        author: 'blue_dancer',
-                        description: 'New moves! Who wants a tutorial? 💃 #dance #trending',
-                        likes: 2500,
-                        isLiked: true,
-                        comments: [],
-                        shares: 1540,
-                        music: 'Top Hits 2024 - Dance Remix'
-                    }
-                ]
-            };
-
-            runInAction(() => {
-                this.videos = mockData.items.map(item => ({
-                    ...item,
-                    secureId: CryptoJS.AES.encrypt(item.id, 'secret-key-123').toString()
-                }));
-                this.loading = false;
-            });
+            await this.loadMoreVideos();
         } catch (error) {
-            runInAction(() => {
-                this.loading = false;
-            });
             console.error('Failed to fetch videos', error);
+        } finally {
+            runInAction(() => this.loading = false);
         }
+    }
+
+    async loadMoreVideos() {
+        // Simulating loading a new "page" of videos
+        const newBatch = [
+            {
+                id: `v${Date.now()}-1`,
+                url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4',
+                author: 'cyberpunk_queen',
+                description: 'More neon vibes! #future',
+                likes: Math.floor(Math.random() * 5000),
+                isLiked: false,
+                comments: [],
+                shares: 100,
+                music: 'Cyber Synth v2'
+            },
+            {
+                id: `v${Date.now()}-2`,
+                url: 'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4',
+                author: 'nature_vibe',
+                description: 'Seasonal changes. 🍃',
+                likes: Math.floor(Math.random() * 2000),
+                isLiked: false,
+                comments: [],
+                shares: 50,
+                music: 'Calm Piano'
+            }
+        ];
+
+        runInAction(() => {
+            this.videos = [...this.videos, ...newBatch];
+        });
+    }
+
+    uploadVideo(videoFile, description) {
+        const newVideo = {
+            id: `user-${Date.now()}`,
+            url: URL.createObjectURL(videoFile),
+            author: 'Daniel77755522',
+            description: description,
+            likes: 0,
+            isLiked: false,
+            comments: [],
+            shares: 0,
+            music: 'Original Sound - Daniel77755522'
+        };
+        runInAction(() => {
+            this.videos = [newVideo, ...this.videos];
+        });
     }
 
     toggleLike(videoId) {

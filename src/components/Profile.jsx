@@ -1,9 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
+    const navigate = useNavigate();
     return (
         <div style={{ color: 'white', backgroundColor: '#000', minHeight: '100vh', padding: '20px' }}>
-            <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <span onClick={() => navigate('/')} style={{ fontSize: '24px' }}>←</span>
+                <span>Daniel77755522</span>
+                <span>⋮</span>
+            </header>
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
                 <div style={{ width: '100px', height: '100px', backgroundColor: '#333', borderRadius: '50%', margin: '0 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '40px' }}>👤</div>
                 <h2 style={{ margin: '15px 0 5px' }}>@Daniel77755522</h2>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '14px', color: '#888' }}>
@@ -21,7 +28,7 @@ const Profile = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2px', marginTop: '2px' }}>
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                    <div key={i} style={{ aspectRatio: '3/4', backgroundColor: '#111', position: 'relative' }}>
+                    <div key={i} onClick={() => navigate('/')} style={{ aspectRatio: '3/4', backgroundColor: '#111', position: 'relative', cursor: 'pointer' }}>
                         <span style={{ position: 'absolute', bottom: '5px', left: '5px', fontSize: '12px' }}>▶ 12.{i}K</span>
                     </div>
                 ))}

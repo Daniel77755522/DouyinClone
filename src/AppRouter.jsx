@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import VideoFeed from './components/VideoFeed';
 import Profile from './components/Profile';
 import Search from './components/Search';
+import Upload from './components/Upload';
 
 const AppRouter = () => {
     return (
@@ -11,6 +12,7 @@ const AppRouter = () => {
                 <Route path="/" element={<VideoFeed />} />
                 <Route path="/profile/:id" element={<Profile />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/upload" element={<Upload />} />
                 <Route path="*" element={<div>404 - Page Not Found</div>} />
             </Routes>
         </Router>

@@ -6,6 +6,7 @@ import './VideoFeed.css';
 const VideoCard = observer(({ video }) => {
     const videoRef = useRef(null);
     const [showComments, setShowComments] = useState(false);
+    const [showShare, setShowShare] = useState(false);
 
     useEffect(() => {
         const options = { threshold: 0.6 };
@@ -63,7 +64,7 @@ const VideoCard = observer(({ video }) => {
                     <span className="sidebar-count">Save</span>
                 </div>
 
-                <div className="sidebar-item">
+                <div className="sidebar-item" onClick={() => setShowShare(true)}>
                     <div className="sidebar-icon">↪️</div>
                     <span className="sidebar-count">{video.shares}</span>
                 </div>
@@ -97,14 +98,55 @@ const VideoCard = observer(({ video }) => {
                     {video.comments.length === 0 && <p style={{ textAlign: 'center', opacity: 0.5 }}>No comments yet. Be the first!</p>}
                 </div>
             </div>
+
+            {/* Share Drawer */}
+            <div className={`share-modal ${showShare ? 'show' : ''}`}>
+                <div style={{ display: 'flex', justifyContent: 'center', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+                    <strong>Share to</strong>
+                </div>
+                <div className="share-grid">
+                    <div className="share-item">
+                        <div className="share-icon">🔗</div>
+                        <span>Copy Link</span>
+                    </div>
+                    <div className="share-item">
+                        <div className="share-icon" style={{ backgroundColor: '#25D366', color: 'white' }}>💬</div>
+                        <span>WhatsApp</span>
+                    </div>
+                    <div className="share-item">
+                        <div className="share-icon" style={{ backgroundColor: '#1877F2', color: 'white' }}>f</div>
+                        <span>Facebook</span>
+                    </div>
+                    <div className="share-item">
+                        <div className="share-icon">📥</div>
+                        <span>Save Video</span>
+                    </div>
+                </div>
+                <button
+                    onClick={() => setShowShare(false)}
+                    style={{ width: '100%', padding: '15px', border: 'none', background: 'none', borderTop: '1px solid #eee', marginTop: '10px', fontWeight: 'bold' }}
+                >
+                    Cancel
+                </button>
+            </div>
         </div>
     );
 });
 
+import { Link, useNavigate } from 'react-router-dom';
+
 const VideoFeed = observer(() => {
+    const navigate = useNavigate();
     useEffect(() => {
         videoStore.fetchVideos();
     }, []);
+
+    const handleScroll = (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        if (scrollHeight - scrollTop <= clientHeight + 50) {
+            videoStore.loadMoreVideos();
+        }
+    };
 
     if (videoStore.loading) return <div className="loading" style={{ color: 'white', backgroundColor: '#000', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading Douyin Feed...</div>;
 
@@ -115,18 +157,25 @@ const VideoFeed = observer(() => {
                 <div className="header-item active">For You</div>
             </header>
 
-            <div className="video-container">
-                {videoStore.videos.map((video) => (
-                    <VideoCard key={video.id} video={video} />
-                ))}
+            <div className="video-container" onScroll={handleScroll}>
+                {videoStore.videos.length === 0 ? (
+                    <div style={{ color: 'white', textAlign: 'center', marginTop: '100px' }}>
+                        <p>No videos yet.</p>
+                        <Link to="/upload" style={{ color: '#ff3b5c' }}>Upload your first video!</Link>
+                    </div>
+                ) : (
+                    videoStore.videos.map((video) => (
+                        <VideoCard key={video.id} video={video} />
+                    ))
+                )}
             </div>
 
             <nav className="bottom-nav">
-                <div className="nav-item active">Home</div>
-                <div className="nav-item">Friends</div>
-                <div className="nav-add-btn">+</div>
+                <div className="nav-item active" onClick={() => navigate('/')}>Home</div>
+                <div className="nav-item" onClick={() => navigate('/search')}>Friends</div>
+                <div className="nav-add-btn" onClick={() => navigate('/upload')}>+</div>
                 <div className="nav-item">Inbox</div>
-                <div className="nav-item">Profile</div>
+                <div className="nav-item" onClick={() => navigate('/profile/me')}>Profile</div>
             </nav>
         </>
     );
