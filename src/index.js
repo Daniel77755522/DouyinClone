@@ -11,6 +11,15 @@ import ReactDOM from 'react-dom/client';
 import AppRouter from './AppRouter';
 import './index.css';
 
+const AppRoot = () => {
+    useEffect(() => {
+        // Initialize PrismJS highlighting
+        Prism.highlightAll();
+    }, []);
+
+    return <AppRouter />;
+};
+
 // Register PWA Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -25,6 +34,6 @@ if ('serviceWorker' in navigator) {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <AppRouter />
+        <AppRoot />
     </React.StrictMode>
 );
